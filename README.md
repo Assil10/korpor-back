@@ -26,6 +26,7 @@ It also integrates with Cloudinary for image uploads and includes Swagger for AP
 - **src/**
    - **controllers/**
        - `adminController.js`
+       - `roleController.js`
        - `authController.js`
        - `userController.js`
   
