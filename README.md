@@ -42,9 +42,10 @@ It also integrates with Cloudinary for image uploads and includes Swagger for AP
        - `roleRoutes.js`
        - `userRoutes.js`
 
-  - `swaggerConfig.js`
 
-  - `server.js`
+- **swaggerConfig.js**
+
+- **server.js**
 
 - **.env**
 
@@ -57,6 +58,8 @@ It also integrates with Cloudinary for image uploads and includes Swagger for AP
 - **README.md**
 
 
+
+---
 
 
 
