@@ -1,31 +1,22 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-const swaggerOptions = {
+const options = {
   definition: {
     openapi: '3.0.0',
-    info: { title: 'Korpor API', version: '1.0.0' },
-    servers: [{ url: 'http://localhost:5000' }],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-        },
-      },
+    info: {
+      title: 'Korpor API Documentation',
+      version: '1.0.0',
     },
-    security: [{ bearerAuth: [] }],
+    servers: [
+      { url: 'http://localhost:5000' }
+    ],
   },
-  apis: ['./src/server.js'], 
+  apis: ['./src/routes/*.js', './src/controllers/*.js'], // Specify where your annotated files are
 };
 
-const swaggerSpec = swaggerJSDoc(swaggerOptions);
+const swaggerSpec = swaggerJSDoc(options);
 
-// This function must be exported exactly like this:
-function setupSwagger(app) {
+module.exports = (app) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  console.log('Swagger Docs available at http://localhost:5000/api-docs');
-}
-
-module.exports = setupSwagger;
+};
