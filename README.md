@@ -20,30 +20,7 @@ It also integrates with Cloudinary for image uploads and includes Swagger for AP
 
 ## Project Structure
 
-.
-├── src
-│   ├── controllers
-│   │   ├── adminController.js
-│   │   ├── authController.js
-│   │   ├── roleController.js
-│   │   └── userController.js
-│   ├── middleware
-│   │   └── auth.js
-│   ├── models
-│   │   ├── Role.js
-│   │   └── User.js
-│   ├── routes
-│   │   ├── adminRoutes.js
-│   │   ├── authRoutes.js
-│   │   ├── roleRoutes.js
-│   │   └── userRoutes.js
-│   ├── swaggerConfig.js
-│   └── server.js
-├── .env
-├── .gitignore
-├── package.json
-├── package-lock.json
-└── README.
+. ├── src │ ├── controllers │ │ ├── adminController.js │ │ ├── authController.js │ │ ├── roleController.js │ │ └── userController.js │ ├── middleware │ │ └── auth.js │ ├── models │ │ ├── Role.js │ │ └── User.js │ ├── routes │ │ ├── adminRoutes.js │ │ ├── authRoutes.js │ │ ├── roleRoutes.js │ │ └── userRoutes.js │ ├── swaggerConfig.js │ └── server.js ├── .env ├── .gitignore ├── package.json ├── package-lock.json └── README.md
 
 
 
@@ -73,7 +50,7 @@ You will also need to create a `.env` file in the root of the project with your 
 
 1. **Clone the repository** (or download it)  
    ```bash
-   git clone https://github.com/your-username/your-repo.git
+   git clone https://github.com/Assil10/korpor-back
    cd your-repo
 
 
@@ -237,6 +214,5 @@ Pull requests, issues, and feature requests are welcome. Please follow the exist
 4. **Start the server** with `npm run dev`.
 5. **Access the API documentation** at `http://localhost:5000/api-docs`.
 
-This README file should help frontend developers understand how to set up and use your backend API. Let me know if you need any further adjustments!
 
 
