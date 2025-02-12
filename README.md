@@ -20,8 +20,7 @@ It also integrates with Cloudinary for image uploads and includes Swagger for AP
 
 ## Project Structure
 
-. ├── src │ ├── controllers │ │ ├── adminController.js │ │ ├── authController.js │ │ ├── roleController.js │ │ └── userController.js │ ├── middleware │ │ └── auth.js │ ├── models │ │ ├── Role.js │ │ └── User.js │ ├── routes │ │ ├── adminRoutes.js │ │ ├── authRoutes.js │ │ ├── roleRoutes.js │ │ └── userRoutes.js │ ├── swaggerConfig.js │ └── server.js ├── .env ├── .gitignore ├── package.json ├── package-lock.json └── README.md
-
+'''. ├── src │ ├── controllers │ │ ├── adminController.js │ │ ├── authController.js │ │ ├── roleController.js │ │ └── userController.js │ ├── middleware │ │ └── auth.js │ ├── models │ │ ├── Role.js │ │ └── User.js │ ├── routes │ │ ├── adminRoutes.js │ │ ├── authRoutes.js │ │ ├── roleRoutes.js │ │ └── userRoutes.js │ ├── swaggerConfig.js │ └── server.js ├── .env ├── .gitignore ├── package.json ├── package-lock.json └── README.md'''
 
 
 
