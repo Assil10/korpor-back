@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  accountNo: { type: Number, unique: true }, // Auto-incrementing account number
   name: { type: String },
   surname: { type: String },
   email: { type: String, unique: true, required: true },
