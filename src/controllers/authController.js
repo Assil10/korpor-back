@@ -12,12 +12,14 @@ exports.signUp = async (req, res) => {
     }
 
     const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "User already exists" });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate a new verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate a new 4-digit verification code
+    const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
     const expiryTime = Date.now() + 10 * 60 * 1000; // Code expires in 10 minutes
 
     // Find the last registered user and get the highest accountNo
@@ -68,7 +70,6 @@ exports.signUp = async (req, res) => {
 
 
 
-
 exports.verifysign= async (req, res) => {
   try {
     const { email, code } = req.body;
@@ -87,7 +88,7 @@ exports.verifysign= async (req, res) => {
       return res.status(400).json({ message: "Verification code has expired" });
     }
 
-    // ✅ Approve the user
+    //  Approve the user
     user.approvalStatus = "approved";
     user.resetCode = null;
     user.resetCodeExpires = null;
