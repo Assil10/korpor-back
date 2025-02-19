@@ -64,6 +64,90 @@ router.post('/verifysign', authController.verifysign);
 
 /**
  * @swagger
+ * /api/auth/sign-in:
+ *   post:
+ *     summary: Sign in a user
+ *     tags: [Authentication]
+ *     description: Authenticate a user with email and password, returning a JWT token upon success.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "user@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "password123"
+ *     responses:
+ *       200:
+ *         description: Sign-in successful, returns a JWT token and user details.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Sign-in successful"
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     accountNo:
+ *                       type: number
+ *                       example: 1001
+ *                     name:
+ *                       type: string
+ *                       example: "John"
+ *                     surname:
+ *                       type: string
+ *                       example: "Doe"
+ *                     email:
+ *                       type: string
+ *                       example: "user@example.com"
+ *                     role:
+ *                       type: string
+ *                       enum: ["super admin", "admin", "user"]
+ *                       example: "user"
+ *                     profilePicture:
+ *                       type: string
+ *                       example: ""
+ *       400:
+ *         description: Invalid email or password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid email or password"
+ *       403:
+ *         description: Account not approved yet.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Your account is not approved yet"
+ *       500:
+ *         description: Server error.
+ */
+router.post('/sign-in', authController.signIn);
+
+
+
+
+/**
+ * @swagger
  * /api/auth/register:
  *   post:
  *     summary: Register a new user
@@ -90,6 +174,8 @@ router.post('/verifysign', authController.verifysign);
  *       201:
  *         description: Registration request submitted.
  */
+
+
 router.post('/register', authController.register);
 
 /**

@@ -103,6 +103,57 @@ exports.verifysign= async (req, res) => {
 
 
 
+exports.signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    if (user.approvalStatus !== 'approved') {
+      return res.status(403).json({ message: "Your account is not approved yet" });
+    }
+
+    // Generate JWT Token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET, // Use a strong secret key from .env
+      { expiresIn: "7d" } // Token valid for 7 days
+    );
+
+    res.json({
+      message: "Sign-in successful",
+      token,
+      user: {
+        accountNo: user.accountNo,
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture,
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+
+
 exports.register = async (req, res) => {
   try {
     const { name, surname, email, password, birthdate } = req.body;
