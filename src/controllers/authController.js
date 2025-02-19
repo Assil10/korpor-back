@@ -3,6 +3,103 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 
+exports.signUp = async (req, res) => {
+  try {
+    const { name, surname, email, password, birthdate } = req.body;
+
+    if (!name || !surname || !email || !password || !birthdate) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: "User already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate a new verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiryTime = Date.now() + 10 * 60 * 1000; // Code expires in 10 minutes
+
+    // Find the last registered user and get the highest accountNo
+    const lastUser = await User.findOne().sort({ accountNo: -1 });
+    const newAccountNo = lastUser && lastUser.accountNo ? lastUser.accountNo + 1 : 1000;
+
+    const newUser = new User({
+      accountNo: newAccountNo,
+      name,
+      surname,
+      email,
+      password: hashedPassword,
+      birthdate,
+      approvalStatus: "pending",
+      resetCode: verificationCode,
+      resetCodeExpires: expiryTime,
+    });
+
+    await newUser.save();
+
+    // Send the verification code via email
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    let mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification Code",
+      text: `Your email verification code is: ${verificationCode}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(201).json({
+      message: "Sign-up request submitted successfully. Check your email for verification code.",
+      accountNo: newUser.accountNo,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+
+
+exports.verifysign= async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({ message: "Email and code are required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user || user.resetCode !== code) {
+      return res.status(400).json({ message: "Invalid or expired verification code" });
+    }
+
+    if (Date.now() > user.resetCodeExpires) {
+      return res.status(400).json({ message: "Verification code has expired" });
+    }
+
+    // ✅ Approve the user
+    user.approvalStatus = "approved";
+    user.resetCode = null;
+    user.resetCodeExpires = null;
+    await user.save();
+
+    res.json({ message: "Email verified successfully. Your account is now active!" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
 
 
 exports.register = async (req, res) => {
@@ -65,7 +162,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '1m' }
     );
 
     res.json({
