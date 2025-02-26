@@ -130,7 +130,7 @@ exports.signIn = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET, // Use a strong secret key from .env
-      { expiresIn: "7d" } // Token valid for 7 days
+      { expiresIn: "4h" } // Token valid for 7 days
     );
 
     res.json({
@@ -169,7 +169,7 @@ exports.register = async (req, res) => {
 
     // Generate a 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
-    const expirationTime = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+    const expirationTime = Date.now() + 5 * 60 * 1000; // 10 minutes expiry
 
     // Find last registered user and get highest accountNo
     const lastUser = await User.findOne().sort({ accountNo: -1 });
@@ -302,7 +302,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '1m' }
+      { expiresIn: '4h' }
     );
 
     res.json({
