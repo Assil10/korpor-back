@@ -178,6 +178,39 @@ router.post('/sign-in', authController.signIn);
 
 router.post('/register', authController.register);
 
+
+
+
+
+/**
+ * @swagger
+ * /api/auth/verify-register:
+ *   post:
+ *     summary: Verify email for registration
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email verified successfully. Waiting for admin approval.
+ *       400:
+ *         description: Invalid or expired verification code.
+ */
+router.post('/verify-register', authController.verifyregister);
+
+
+
+
+
 /**
  * @swagger
  * /api/auth/login:

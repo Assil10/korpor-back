@@ -156,9 +156,9 @@ exports.signIn = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, surname, email, password, birthdate } = req.body;
+    const { name, surname, email, password } = req.body;
 
-    if (!name || !surname || !email || !password || !birthdate) {
+    if (!name || !surname || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -167,7 +167,11 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Find the last registered user and get the highest accountNo
+    // Generate a 6-digit verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    const expirationTime = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+
+    // Find last registered user and get highest accountNo
     const lastUser = await User.findOne().sort({ accountNo: -1 });
     const newAccountNo = lastUser && lastUser.accountNo ? lastUser.accountNo + 1 : 1000; // Start from 1000
 
@@ -177,19 +181,103 @@ exports.register = async (req, res) => {
       surname,
       email,
       password: hashedPassword,
-      birthdate,
-      role: 'user',
-      approvalStatus: 'pending'
+      role: "user",
+      approvalStatus: "pending",
+      resetCode: verificationCode.toString(),
+      resetCodeExpires: expirationTime
     });
 
     await newUser.save();
 
-    res.status(201).json({
-      message: "Registration request submitted successfully. Await admin approval.",
-      accountNo: newUser.accountNo
+    // Send email with verification code
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
     });
+
+    let mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification Code",
+      text: `Your email verification code is: ${verificationCode}. It will expire in 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(201).json({
+      message: "Registration request submitted successfully. Check your email for the verification code.",
+      accountNo: newUser.accountNo,
+    });
+
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+
+
+exports.verifyregister = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({ message: "Email and code are required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user || user.resetCode !== code) {
+      return res.status(400).json({ message: "Invalid or expired verification code" });
+    }
+
+    if (Date.now() > user.resetCodeExpires) {
+      return res.status(400).json({ message: "Verification code has expired" });
+    }
+
+    // Clear the verification code
+    user.resetCode = null;
+    user.resetCodeExpires = null;
+
+    // Send request to admin for approval
+    await sendApprovalRequestToAdmins(user);
+
+    res.json({ message: "Email verified successfully. Waiting for admin approval." });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+// Function to notify admins & super admins about new approval request
+const sendApprovalRequestToAdmins = async (user) => {
+  try {
+    const admins = await User.find({ role: { $in: ["admin", "super admin"] } });
+
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    for (let admin of admins) {
+      let mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: admin.email,
+        subject: "New User Approval Request",
+        text: `A new user (${user.name} ${user.surname} - ${user.email}) has completed email verification and is awaiting approval.`,
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
+
+  } catch (error) {
+    console.error("Error sending approval request emails:", error);
   }
 };
 
