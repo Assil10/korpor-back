@@ -169,7 +169,7 @@ exports.register = async (req, res) => {
 
     // Generate a 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
-    const expirationTime = Date.now() + 5 * 60 * 1000; // 10 minutes expiry
+    const expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
 
     // Find last registered user and get highest accountNo
     const lastUser = await User.findOne().sort({ accountNo: -1 });
@@ -316,6 +316,29 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+
+exports.checkUser = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.approvalStatus !== 'approved') {
+      await User.deleteOne({ email });
+      return res.json({ message: 'User was not approved and has been deleted' });
+    }
+
+    res.json({ message: 'User is approved' });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 

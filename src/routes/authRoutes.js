@@ -259,6 +259,63 @@ router.post('/login', authController.login);
  */
 router.post('/forgot-password', authController.forgotPassword);
 
+
+
+
+
+
+
+/**
+ * @swagger
+ * /api/auth/check-user:
+ *   post:
+ *     summary: Check if a user is approved. If not, delete the user.
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: User is approved.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User is approved"
+ *       202:
+ *         description: User was not approved and has been deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User was not approved and has been deleted"
+ *       400:
+ *         description: Bad request - Missing email.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Server error.
+ */
+router.post('/check-user', authController.checkUser);
+
+
+
+
+
+
 /**
  * @swagger
  * /api/auth/verify-code:
