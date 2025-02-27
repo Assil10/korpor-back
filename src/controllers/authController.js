@@ -287,18 +287,32 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password)
+    if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
+    }
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
-    if (user.approvalStatus !== 'approved')
+    // Check if OTP verification is incomplete
+    if (user.resetCode) {
+      return res.status(403).json({ message: "Email verification required. Check your email for the OTP." });
+    }
+
+    // Check if the account is still waiting for admin approval
+    if (user.approvalStatus !== "approved") {
       return res.status(403).json({ message: "Registration pending admin approval" });
+    }
 
+    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
@@ -307,13 +321,15 @@ exports.login = async (req, res) => {
 
     res.json({
       user: {
-        accountNo: user.accountNo || "12345", // Default value if accountNo is missing
+        id: user._id,  // Include user ID in response
+        accountNo: user.accountNo || "12345",
         email: user.email,
-        role: user.role || ["user"], // Default role if missing
+        role: user.role || ["user"],
         exp: Math.floor(Date.now() / 1000) + 3600, // Token expiry time
       },
       token: token
     });
+
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
