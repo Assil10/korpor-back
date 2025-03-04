@@ -22,6 +22,10 @@ It also integrates with Cloudinary for image uploads and includes Swagger for AP
 
 
 
+=======
+
+
+
 
 - **src/**
    - **controllers/**
@@ -89,7 +93,11 @@ You will also need to create a `.env` file in the root of the project with your 
 
 1. **Clone the repository** (or download it)  
    ```bash
+
+  
+
    'git clone https://github.com/Assil10/korpor-back/'
+
    cd your-repo
 
 
