@@ -255,8 +255,8 @@ exports.signIn = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "4h" }
+      process.env.JWT_SECRET, // Use a strong secret key from .env
+      { expiresIn: "4h" } // Token valid for 4 hours
     );
 
     res.json({
